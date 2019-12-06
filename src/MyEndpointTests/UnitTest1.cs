@@ -19,7 +19,7 @@ namespace MyEndpointTests
             await handler.Handle(new MyMessage(), context)
                 .ConfigureAwait(false);
 
-            Assert.Empty(context.RepliedMessages);
+            Assert.Empty(context.SentMessages);
             //Assert.IsInstanceOf<MyResponse>(context.RepliedMessages[0].Message);
         }
     }
