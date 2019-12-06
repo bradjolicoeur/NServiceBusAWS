@@ -1,0 +1,2 @@
+/home/brad/Documents/nservicebus/src/MyEndpointTests/obj/Debug/netcoreapp3.0/MyEndpointTests.AssemblyInfoInputs.cache
+/home/brad/Documents/nservicebus/src/MyEndpointTests/obj/Debug/netcoreapp3.0/MyEndpointTests.AssemblyInfo.cs
