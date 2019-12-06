@@ -1,3 +1,0 @@
-/home/brad/Documents/nservicebus/src/MyEndpointTests/obj/Debug/netcoreapp2.2/MyEndpointTests.csprojAssemblyReference.cache
-/home/brad/Documents/nservicebus/src/MyEndpointTests/obj/Debug/netcoreapp2.2/MyEndpointTests.AssemblyInfoInputs.cache
-/home/brad/Documents/nservicebus/src/MyEndpointTests/obj/Debug/netcoreapp2.2/MyEndpointTests.AssemblyInfo.cs

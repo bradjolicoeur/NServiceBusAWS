@@ -1,2 +1,0 @@
-﻿2019-12-05 20:57:11.217 INFO  DefaultFactory Logging to '/home/brad/Documents/nservicebus/src/MyEndpointTests/bin/Debug/netcoreapp2.1/' with level Info
-2019-12-05 20:57:11.239 INFO  MyEndpoint.Handlers.HandleMyMessage Message Handled 

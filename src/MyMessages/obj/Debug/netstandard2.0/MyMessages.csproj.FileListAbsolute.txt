@@ -1,8 +1,0 @@
-/home/brad/Documents/nservicebus/src/MyMessages/bin/Debug/netstandard2.0/MyMessages.deps.json
-/home/brad/Documents/nservicebus/src/MyMessages/bin/Debug/netstandard2.0/MyMessages.dll
-/home/brad/Documents/nservicebus/src/MyMessages/bin/Debug/netstandard2.0/MyMessages.pdb
-/home/brad/Documents/nservicebus/src/MyMessages/obj/Debug/netstandard2.0/MyMessages.csprojAssemblyReference.cache
-/home/brad/Documents/nservicebus/src/MyMessages/obj/Debug/netstandard2.0/MyMessages.AssemblyInfoInputs.cache
-/home/brad/Documents/nservicebus/src/MyMessages/obj/Debug/netstandard2.0/MyMessages.AssemblyInfo.cs
-/home/brad/Documents/nservicebus/src/MyMessages/obj/Debug/netstandard2.0/MyMessages.dll
-/home/brad/Documents/nservicebus/src/MyMessages/obj/Debug/netstandard2.0/MyMessages.pdb
