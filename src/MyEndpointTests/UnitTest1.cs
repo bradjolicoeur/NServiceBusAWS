@@ -1,7 +1,5 @@
-using System;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Extensions;
 using NServiceBus.Testing;
 using MyMessages.Commands;
 using MyEndpoint.Handlers;
