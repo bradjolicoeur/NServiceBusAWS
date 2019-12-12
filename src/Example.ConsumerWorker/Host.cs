@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Logging;
+using Autofac;
 
 namespace Example.ConsumerWorker
 {
@@ -13,7 +14,7 @@ namespace Example.ConsumerWorker
         // LogManager.Use<TheLoggingFactory>();
         static readonly ILog log = LogManager.GetLogger<Host>();
 
-        IEndpointInstance endpoint;
+        IEndpointInstance endpoint = null;
 
         // TODO: give the endpoint an appropriate name
         public string EndpointName => "example.consumerworker";
@@ -22,34 +23,40 @@ namespace Example.ConsumerWorker
         {
             try
             {
-                // TODO: consider moving common endpoint configuration into a shared project
-                // for use by all endpoints in the system
                 var endpointConfiguration = new EndpointConfiguration(EndpointName);
 
-                // TODO: ensure the most appropriate serializer is chosen
-                // https://docs.particular.net/nservicebus/serialization/
+                var builder = new ContainerBuilder();
+
+                IEndpointInstance endpoint = null;
+                builder.Register(x => endpoint)
+                    .As<IEndpointInstance>()
+                    .SingleInstance();
+
+                var container = builder.Build();
+
+                endpointConfiguration.UseContainer<AutofacBuilder>(
+                    customizations: customizations =>
+                    {
+                        customizations.ExistingLifetimeScope(container);
+                    });
+
                 endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
 
-                // TODO: remove this condition after choosing a transport, persistence and deployment method suitable for production
-                if (Environment.UserInteractive && Debugger.IsAttached)
-                {
-                    // TODO: choose a durable transport for production
-                    // https://docs.particular.net/transports/
-                    var transportExtensions = endpointConfiguration.UseTransport<LearningTransport>();
+                var transportExtensions = endpointConfiguration.UseTransport<LearningTransport>();
 
-                    // TODO: choose a durable persistence for production
-                    // https://docs.particular.net/persistence/
-                    endpointConfiguration.UsePersistence<LearningPersistence>();
+                endpointConfiguration.UsePersistence<LearningPersistence>();
 
-                    // TODO: create a script for deployment to production
-                    endpointConfiguration.EnableInstallers();
-                }
+                endpointConfiguration.EnableInstallers();
 
-                // TODO: replace the license.xml file with your license file
+                var conventions = endpointConfiguration.Conventions();
+                conventions.DefiningCommandsAs(
+                    type =>
+                    {
+                        return type.Namespace.EndsWith("Messages.Commands");
+                    });
 
-                // TODO: perform any futher start up operations before or after starting the endpoint
                 endpoint = await Endpoint.Start(endpointConfiguration);
             }
             catch (Exception ex)

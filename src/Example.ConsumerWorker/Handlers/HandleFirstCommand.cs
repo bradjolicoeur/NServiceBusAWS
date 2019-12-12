@@ -11,8 +11,7 @@ namespace Example.ConsumerWorker.Handlers
     public class HandleFirstCommand : IHandleMessages<FirstCommand>
     {
 
-        //TODO: can we inject this instead?
-        static ILog log = LogManager.GetLogger<HandleFirstCommand>();
+       static ILog log = LogManager.GetLogger<HandleFirstCommand>();
 
         public Task Handle(FirstCommand message, IMessageHandlerContext context)
         {
