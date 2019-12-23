@@ -68,10 +68,7 @@ namespace Example.ConsumerWorker
                         UseHttp = true,
                     }));
 
-                endpointConfiguration.UsePersistence<LearningPersistence>();
-
-                //TODO: set appropriate persistance for SQS
-                endpointConfiguration.DisableFeature<MessageDrivenSubscriptions>();
+                endpointConfiguration.UsePersistence<InMemoryPersistence>();
 
                 endpointConfiguration.EnableInstallers();
 
