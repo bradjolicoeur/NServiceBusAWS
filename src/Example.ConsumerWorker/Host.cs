@@ -8,6 +8,7 @@ using Amazon.SQS;
 using Amazon.Runtime;
 using Amazon.S3;
 using NServiceBus.Features;
+using Example.ConsumerWorker.Messages.Commands;
 
 namespace Example.ConsumerWorker
 {
@@ -17,6 +18,8 @@ namespace Example.ConsumerWorker
         // https://docs.particular.net/nservicebus/logging/#custom-logging
         // LogManager.Use<TheLoggingFactory>();
         static readonly ILog log = LogManager.GetLogger<Host>();
+
+        private static readonly string TransportConfiguration = Environment.GetEnvironmentVariable("TRANSPORT_CONFIGURATION");
 
         IEndpointInstance endpoint = null;
 
@@ -48,27 +51,18 @@ namespace Example.ConsumerWorker
 
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
 
-                //var transportExtensions = endpointConfiguration.UseTransport<LearningTransport>();
+                TransportExtensions transport = null;
 
-                var transport = endpointConfiguration.UseTransport<SqsTransport>();
-                transport.ClientFactory(() => new AmazonSQSClient(new EnvironmentVariablesAWSCredentials(),
-                    new AmazonSQSConfig //for localstack
-                    {
-                        ServiceURL = "http://localhost:4576",
-                        UseHttp = true,
-                    }));
-
-                // S3 bucket only required for messages larger than 256KB
-                var s3Configuration = transport.S3("myBucketName", "my/key/prefix");
-                s3Configuration.ClientFactory(() => new AmazonS3Client(new EnvironmentVariablesAWSCredentials()
-                    , new AmazonS3Config //for localstack
-                    {
-                        ServiceURL = "http://localhost:4572",
-                        ForcePathStyle = true,
-                        UseHttp = true,
-                    }));
-
-                endpointConfiguration.UsePersistence<InMemoryPersistence>();
+                if (TransportConfiguration.Equals("LearningTransport"))
+                {
+                    transport = ConfigureLearningTransport(endpointConfiguration);
+                    endpointConfiguration.UsePersistence<LearningPersistence>();
+                }
+                else
+                {
+                    transport = ConfigureLocalStackTransport(endpointConfiguration);
+                    endpointConfiguration.UsePersistence<InMemoryPersistence>();
+                }
 
                 endpointConfiguration.EnableInstallers();
 
@@ -85,6 +79,50 @@ namespace Example.ConsumerWorker
             {
                 FailFast("Failed to start.", ex);
             }
+        }
+
+        private static void ConfigureMessageRouting(RoutingSettings routing)
+        {
+            routing.RouteToEndpoint(
+                        messageType: typeof(FirstCommand)
+                        , destination: "example.consumerworker"
+                        );
+        }
+
+        private TransportExtensions ConfigureLearningTransport(EndpointConfiguration endpointConfiguration)
+        {
+            var transport = endpointConfiguration.UseTransport<LearningTransport>();
+
+            return transport;
+        }
+
+        private TransportExtensions ConfigureLocalStackTransport(EndpointConfiguration endpointConfiguration)
+        {
+            var transport = endpointConfiguration.UseTransport<SqsTransport>();
+            //configure client factory for localstack...not needed for normal AWS
+            transport.ClientFactory(() => new AmazonSQSClient(
+                new EnvironmentVariablesAWSCredentials(),
+                new AmazonSQSConfig //for localstack
+                {
+                    ServiceURL = "http://localhost:4576",
+                    UseHttp = true,
+                }));
+
+            // S3 bucket only required for messages larger than 256KB
+            var s3Configuration = transport.S3("myBucketName", "my/key/prefix");
+
+            //configure client factory for localstack...not needed for normal AWS
+            s3Configuration.ClientFactory(() =>
+                new AmazonS3Client(new EnvironmentVariablesAWSCredentials()
+                , new AmazonS3Config
+                {
+                    ServiceURL = "http://localhost:4572",
+                    ForcePathStyle = true,
+                    UseHttp = true,
+                }));
+
+
+            return transport;
         }
 
         public async Task Stop()
