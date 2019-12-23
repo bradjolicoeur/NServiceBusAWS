@@ -4,6 +4,10 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Logging;
 using Autofac;
+using Amazon.SQS;
+using Amazon.Runtime;
+using Amazon.S3;
+using NServiceBus.Features;
 
 namespace Example.ConsumerWorker
 {
@@ -44,9 +48,30 @@ namespace Example.ConsumerWorker
 
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
 
-                var transportExtensions = endpointConfiguration.UseTransport<LearningTransport>();
+                //var transportExtensions = endpointConfiguration.UseTransport<LearningTransport>();
+
+                var transport = endpointConfiguration.UseTransport<SqsTransport>();
+                transport.ClientFactory(() => new AmazonSQSClient(new EnvironmentVariablesAWSCredentials(),
+                    new AmazonSQSConfig //for localstack
+                    {
+                        ServiceURL = "http://localhost:4576",
+                        UseHttp = true,
+                    }));
+
+                // S3 bucket only required for messages larger than 256KB
+                var s3Configuration = transport.S3("myBucketName", "my/key/prefix");
+                s3Configuration.ClientFactory(() => new AmazonS3Client(new EnvironmentVariablesAWSCredentials()
+                    , new AmazonS3Config //for localstack
+                    {
+                        ServiceURL = "http://localhost:4572",
+                        ForcePathStyle = true,
+                        UseHttp = true,
+                    }));
 
                 endpointConfiguration.UsePersistence<LearningPersistence>();
+
+                //TODO: set appropriate persistance for SQS
+                endpointConfiguration.DisableFeature<MessageDrivenSubscriptions>();
 
                 endpointConfiguration.EnableInstallers();
 
