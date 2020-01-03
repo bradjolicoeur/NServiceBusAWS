@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Example.ConsumerWorker.Messages\Example.ConsumerWorker.Messages.csproj" />
     <ProjectReference Include="..\Example.NSBConfiguration\Example.NSBConfiguration.csproj" />
   </ItemGroup>
 

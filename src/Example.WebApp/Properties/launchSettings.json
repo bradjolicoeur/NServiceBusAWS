@@ -1,0 +1,33 @@
+{
+  
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Example.WebApp": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/processpayment",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AWS_REGION": "us-east-2",
+        "AWS_SECRET_ACCESS_KEY": "123",
+        "TRANSPORT_CONFIGURATION": "LocalStackTransport",
+        "AWS_ACCESS_KEY_ID": "123"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/processpayment",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AWS_REGION": "us-east-2",
+        "AWS_SECRET_ACCESS_KEY": "123",
+        "TRANSPORT_CONFIGURATION": "LocalStackTransport",
+        "AWS_ACCESS_KEY_ID": "123"
+      },
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  }
+}

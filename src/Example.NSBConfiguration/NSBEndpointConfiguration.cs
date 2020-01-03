@@ -1,20 +1,38 @@
-﻿using System;
-using NServiceBus;
+﻿using NServiceBus;
 using Autofac;
-using Example.ConsumerWorker.Messages.Commands;
 using Amazon.SQS;
 using Amazon.Runtime;
 using Amazon.S3;
+using Example.PaymentSaga.Contracts.Commands;
+using Example.PaymentProcessor.Contracts.Commands;
+using Example.PaymentProcessor.Contracts.Events;
 
 namespace Example.NSBConfiguration
 {
     public static class NSBEndpointConfiguration
     {
-        private static readonly string TransportConfiguration = Environment.GetEnvironmentVariable("TRANSPORT_CONFIGURATION");
 
-        public static EndpointConfiguration ConfigureEndpoint(ContainerBuilder builder, string endpointName)
+        public static EndpointConfiguration ConfigureEndpoint(string endpointName)
         {
             var endpointConfiguration = new EndpointConfiguration(endpointName);
+
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+
+            var transport = ConfigureLocalStackTransport(endpointConfiguration);
+            endpointConfiguration.UsePersistence<InMemoryPersistence>();
+
+            ConfigureRouting(transport);
+
+            endpointConfiguration.EnableInstallers();
+
+            ConfigureConventions(endpointConfiguration);
+
+            return endpointConfiguration;
+
+        }
+        public static EndpointConfiguration ConfigureEndpoint(ContainerBuilder builder, string endpointName)
+        {
+            var endpointConfiguration = ConfigureEndpoint(endpointName);
 
             IEndpointInstance endpoint = null;
             builder.Register(x => endpoint)
@@ -29,51 +47,48 @@ namespace Example.NSBConfiguration
                     customizations.ExistingLifetimeScope(container);
                 });
 
-            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+            return endpointConfiguration;
+        }
 
-            TransportExtensions transport = null;
+        private static void ConfigureRouting(TransportExtensions<SqsTransport> transport)
+        {
+            var routing = transport.Routing();
+            routing.RouteToEndpoint(
+                       messageType: typeof(ProcessPayment)
+                       , destination: "Example.PaymentSaga"
+                       );
 
-            if (TransportConfiguration.Equals("LearningTransport"))
-            {
-                transport = ConfigureLearningTransport(endpointConfiguration);
-                endpointConfiguration.UsePersistence<LearningPersistence>();
-            }
-            else
-            {
-                transport = ConfigureLocalStackTransport(endpointConfiguration);
-                endpointConfiguration.UsePersistence<InMemoryPersistence>();
-            }
+            routing.RouteToEndpoint(
+                       messageType: typeof(MakePayment)
+                       , destination: "Example.PaymentProcessorWorker"
+                       );
 
-            ConfigureMessageRouting(transport.Routing());
+            routing.RegisterPublisher(
+                        eventType: typeof(ICompletedMakePayment),
+                        publisherEndpoint: "Example.PaymentProcessorWorker");
+        }
 
-            endpointConfiguration.EnableInstallers();
-
+        private static void ConfigureConventions(EndpointConfiguration endpointConfiguration)
+        {
             var conventions = endpointConfiguration.Conventions();
             conventions.DefiningCommandsAs(
                 type =>
                 {
-                    return type.Namespace.EndsWith("Messages.Commands");
+                    return type.Namespace.EndsWith("Commands");
                 });
-
-            return endpointConfiguration;
+            conventions.DefiningEventsAs(
+                type =>
+                {
+                    return type.Namespace.EndsWith("Events");
+                });
+            conventions.DefiningMessagesAs(
+                type =>
+                {
+                    return type.Namespace.EndsWith("Messages");
+                });
         }
 
-        private static void ConfigureMessageRouting(RoutingSettings routing)
-        {
-            routing.RouteToEndpoint(
-                        messageType: typeof(FirstCommand)
-                        , destination: "example.consumerworker"
-                        );
-        }
-
-        private static TransportExtensions ConfigureLearningTransport(EndpointConfiguration endpointConfiguration)
-        {
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
-
-            return transport;
-        }
-
-        private static TransportExtensions ConfigureLocalStackTransport(EndpointConfiguration endpointConfiguration)
+        private static TransportExtensions<SqsTransport> ConfigureLocalStackTransport(EndpointConfiguration endpointConfiguration)
         {
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
             //configure client factory for localstack...not needed for normal AWS
@@ -86,7 +101,7 @@ namespace Example.NSBConfiguration
                 }));
 
             // S3 bucket only required for messages larger than 256KB
-            var s3Configuration = transport.S3("myBucketName", "my/key/prefix");
+            var s3Configuration = transport.S3("transportbucket", "my/key/prefix");
 
             //configure client factory for localstack...not needed for normal AWS
             s3Configuration.ClientFactory(() =>

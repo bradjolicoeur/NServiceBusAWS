@@ -12,7 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Example.ConsumerWorker.Messages\Example.ConsumerWorker.Messages.csproj" />
+    <ProjectReference Include="..\Example.PaymentProcessor.Contracts\Example.PaymentProcessor.Contracts.csproj" />
+    <ProjectReference Include="..\Example.PaymentSaga.Contracts\Example.PaymentSaga.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
