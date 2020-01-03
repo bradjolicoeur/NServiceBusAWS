@@ -32,6 +32,8 @@ namespace Example.WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             var endpointConfiguration = NSBEndpointConfiguration.ConfigureEndpoint(EndpointName);
+            endpointConfiguration.EnableCallbacks();
+            endpointConfiguration.MakeInstanceUniquelyAddressable("InstanceID"); //TODO: needs to be dynamic for scale up...used for callbacks
 
             services.AddControllers();
             services.AddNServiceBus(endpointConfiguration);

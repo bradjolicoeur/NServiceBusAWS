@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Example.PaymentSaga.Contracts.Commands;
+using Example.PaymentSaga.Contracts.Messages;
 using Microsoft.AspNetCore.Mvc;
 using NServiceBus;
 
@@ -21,8 +22,8 @@ namespace Example.WebApp.Controllers
         public async Task<string> Get()
         {
             var message = new ProcessPayment { ReferenceId = Guid.NewGuid().ToString() };
-            await messageSession.Send(message);
-            return "Message sent to endpoint";
+            var response = await messageSession.Request<ProcessPaymentReply>(message);
+            return "Completed processing payment" + response.ReferenceId;
         }
     }
 }
