@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NServiceBus" Version="7.2.0" />
+    <PackageReference Include="NServiceBus.AmazonSQS" Version="4.4.0" />
+    <PackageReference Include="NServiceBus.Autofac" Version="7.0.0" />
+    <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Example.ConsumerWorker.Messages\Example.ConsumerWorker.Messages.csproj" />
+  </ItemGroup>
+
+</Project>

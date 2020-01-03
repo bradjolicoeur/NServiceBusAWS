@@ -1,16 +1,11 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Logging;
-using Example.ConsumerWorker.Messages.Commands;
 using Example.ProducerWorker.Jobs;
 using FluentScheduler;
 using Autofac;
-using Amazon.SQS;
-using Amazon.Runtime;
-using Amazon.S3;
-using NServiceBus.Features;
+using Example.NSBConfiguration;
 
 namespace Example.ProducerWorker
 {
@@ -33,52 +28,11 @@ namespace Example.ProducerWorker
             try
             {
 
-                var endpointConfiguration = new EndpointConfiguration(EndpointName);
-
                 var builder = new ContainerBuilder();
 
-                IEndpointInstance endpoint = null;
-                builder.Register(x => endpoint)
-                    .As<IEndpointInstance>()
-                    .SingleInstance();
-
-                var container = builder.Build();
-
-                endpointConfiguration.UseContainer<AutofacBuilder>(
-                    customizations: customizations =>
-                    {
-                        customizations.ExistingLifetimeScope(container);
-                    });
-
-                endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+                var endpointConfiguration = NSBEndpointConfiguration.ConfigureEndpoint(builder, EndpointName);
 
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
-
-                TransportExtensions transport = null;
-
-                if (TransportConfiguration.Equals("LearningTransport"))
-                {
-                   transport = ConfigureLearningTransport(endpointConfiguration);
-                    endpointConfiguration.UsePersistence<LearningPersistence>();
-                }
-                else
-                {
-                    transport = ConfigureLocalStackTransport(endpointConfiguration);
-                    endpointConfiguration.UsePersistence<InMemoryPersistence>();
-                }
-
-                ConfigureMessageRouting(transport.Routing());
-
-                
-
-                endpointConfiguration.EnableInstallers();
-
-                var conventions = endpointConfiguration.Conventions();
-                conventions.DefiningCommandsAs(
-                    type =>
-                    {
-                        return type.Namespace.EndsWith("Messages.Commands");
-                    });
 
                 endpoint = await Endpoint.Start(endpointConfiguration);
 
@@ -97,50 +51,6 @@ namespace Example.ProducerWorker
             {
                 FailFast("Failed to start.", ex);
             }
-        }
-
-        private static void ConfigureMessageRouting(RoutingSettings routing)
-        {
-            routing.RouteToEndpoint(
-                        messageType: typeof(FirstCommand)
-                        , destination: "example.consumerworker"
-                        );
-        }
-
-        private TransportExtensions ConfigureLearningTransport(EndpointConfiguration endpointConfiguration)
-        {
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
-
-            return transport;
-        }
-
-        private TransportExtensions ConfigureLocalStackTransport(EndpointConfiguration endpointConfiguration)
-        {
-            var transport = endpointConfiguration.UseTransport<SqsTransport>();
-            //configure client factory for localstack...not needed for normal AWS
-            transport.ClientFactory(() => new AmazonSQSClient(
-                new EnvironmentVariablesAWSCredentials(),
-                new AmazonSQSConfig //for localstack
-                {
-                    ServiceURL = "http://localhost:4576",
-                    UseHttp = true,
-                }));
-
-            // S3 bucket only required for messages larger than 256KB
-            var s3Configuration = transport.S3("myBucketName", "my/key/prefix");
-
-            //configure client factory for localstack...not needed for normal AWS
-            s3Configuration.ClientFactory(() =>
-                new AmazonS3Client(new EnvironmentVariablesAWSCredentials()
-                , new AmazonS3Config
-                {
-                    ServiceURL = "http://localhost:4572",
-                    ForcePathStyle = true,
-                    UseHttp = true,
-                }));
-
-
-            return transport;
         }
 
         public async Task Stop()

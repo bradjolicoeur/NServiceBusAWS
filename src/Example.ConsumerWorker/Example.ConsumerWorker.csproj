@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
-    <PackageReference Include="NServiceBus" Version="7.1.4" />
+    <PackageReference Include="NServiceBus" Version="7.2.0" />
     <PackageReference Include="NServiceBus.AmazonSQS" Version="4.4.0" />
     <PackageReference Include="NServiceBus.Autofac" Version="7.0.0" />
-    <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="2.1.0" />
+    <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Example.ConsumerWorker.Messages\Example.ConsumerWorker.Messages.csproj" />
+    <ProjectReference Include="..\Example.NSBConfiguration\Example.NSBConfiguration.csproj" />
   </ItemGroup>
 
 </Project>
