@@ -18,10 +18,16 @@ namespace Example.NSBConfiguration
 
             endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
-            var transport = ConfigureLocalStackTransport(endpointConfiguration);
+            //Configure the transport option, this can be easily swapped for other queue providers
+            //https://docs.particular.net/transports/
+            var transport = ConfigureTransport(endpointConfiguration);
+
+            //configure the persistance; for subscriptions, sagas, deferrals, timeouts, delayed retries and outbox 
+            //https://docs.particular.net/persistence/
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
 
-            ConfigureRouting(transport);
+            //This routes messages to endpoints and configures subscriptions for events
+            ConfigureMessageRouting(transport);
 
             endpointConfiguration.EnableInstallers();
 
@@ -50,7 +56,7 @@ namespace Example.NSBConfiguration
             return endpointConfiguration;
         }
 
-        private static void ConfigureRouting(TransportExtensions<SqsTransport> transport)
+        private static void ConfigureMessageRouting(TransportExtensions<SqsTransport> transport)
         {
             var routing = transport.Routing();
             routing.RouteToEndpoint(
@@ -88,7 +94,7 @@ namespace Example.NSBConfiguration
                 });
         }
 
-        private static TransportExtensions<SqsTransport> ConfigureLocalStackTransport(EndpointConfiguration endpointConfiguration)
+        private static TransportExtensions<SqsTransport> ConfigureTransport(EndpointConfiguration endpointConfiguration)
         {
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
             //configure client factory for localstack...not needed for normal AWS
