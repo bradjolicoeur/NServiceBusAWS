@@ -16,26 +16,41 @@ namespace Example.NSBConfiguration
         {
             var endpointConfiguration = new EndpointConfiguration(endpointName);
 
-            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
-
             //Configure the transport option, this can be easily swapped for other queue providers
             //https://docs.particular.net/transports/
             var transport = ConfigureTransport(endpointConfiguration);
 
             //configure the persistance; for subscriptions, sagas, deferrals, timeouts, delayed retries and outbox 
             //https://docs.particular.net/persistence/
-            endpointConfiguration.UsePersistence<InMemoryPersistence>();
+            var persistance = ConfigurePersistance(endpointConfiguration);
 
             //This routes messages to endpoints and configures subscriptions for events
+            //https://docs.particular.net/nservicebus/messaging/routing
             ConfigureMessageRouting(transport);
 
+            //This creates the queues if they do not exist as well as any db objects requried
             endpointConfiguration.EnableInstallers();
 
+            //Conventions are used to identify messages 
             ConfigureConventions(endpointConfiguration);
+
+            //This is the format of the message payload, default is xml, however json is a smaller payload size
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             return endpointConfiguration;
 
         }
+
+        private static PersistenceExtensions ConfigurePersistance(EndpointConfiguration endpointConfiguration)
+        {
+            var persistence = endpointConfiguration.UsePersistence<MongoPersistence>();
+            persistence.MongoClient(new MongoDB.Driver.MongoClient("mongodb://root:example@localhost:27017/")); //TODO:This should be in environment variable
+            persistence.UseTransactions(false); //for standalone mongodb...not ideal
+            persistence.DatabaseName("nsbpersistencex");
+
+            return persistence;
+        }
+
         public static EndpointConfiguration ConfigureEndpoint(ContainerBuilder builder, string endpointName)
         {
             var endpointConfiguration = ConfigureEndpoint(endpointName);
