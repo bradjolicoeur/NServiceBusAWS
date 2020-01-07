@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Example.PaymentSaga.Contracts.Commands;
 using Example.PaymentSaga.Contracts.Messages;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using NServiceBus;
 
 namespace Example.WebApp.Controllers
@@ -21,9 +22,9 @@ namespace Example.WebApp.Controllers
         [HttpGet]
         public async Task<string> Get()
         {
-            var message = new ProcessPayment { ReferenceId = Guid.NewGuid().ToString() };
+            var message = new ProcessPayment { ReferenceId = Guid.NewGuid().ToString() , AccountNumber = "123456", RoutingNumber = "555555", Amount = 100.45M, RequestDate = DateTime.UtcNow};
             var response = await messageSession.Request<ProcessPaymentReply>(message);
-            return "Completed processing payment" + response.ReferenceId;
+            return "Completed processing payment: " + JsonConvert.SerializeObject(response);
         }
     }
 }

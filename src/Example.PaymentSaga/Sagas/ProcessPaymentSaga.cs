@@ -8,6 +8,7 @@ using NServiceBus.Logging;
 using Example.PaymentProcessor.Contracts.Commands;
 using Example.PaymentProcessor.Contracts.Events;
 using Example.PaymentSaga.Contracts.Messages;
+using AutoMapper;
 
 namespace Example.PaymentSaga.Sagas
 {
@@ -19,27 +20,51 @@ namespace Example.PaymentSaga.Sagas
 
         static ILog log = LogManager.GetLogger<ProcessPaymentSaga>();
 
+        private IMapper Mapper { get; set; }
+
+        public ProcessPaymentSaga(IMapper mapper)
+        {
+            Mapper = mapper;
+        }
+
         public async Task Handle(ProcessPayment message, IMessageHandlerContext context)
         {
             log.Info("Start Saga for " + Data.ReferenceId);
 
-            await context.Send(new MakePayment { ReferenceId = Data.ReferenceId });
+            //update saga data
+            Mapper.Map(message, Data);
 
-            await RequestTimeout<ProcessPaymentTimeout>(context, TimeSpan.FromMinutes(3));
+            //Send command
+            await context.Send(Mapper.Map<MakePayment>(Data));
+
+            //Set timeout
+            await RequestTimeout<ProcessPaymentTimeout>(context, TimeSpan.FromSeconds(45));
         }
 
         public async Task Handle(ICompletedMakePayment message, IMessageHandlerContext context)
         {
             log.Info("Handle ICompletedMakePayment " + message.ReferenceId);
 
-            await ReplyToOriginator(context, new ProcessPaymentReply { ReferenceId = Data.ReferenceId });
+            //update saga
+            Mapper.Map(message, Data);
+
+            await ReplyToOriginator(context, Mapper.Map<ProcessPaymentReply>(Data));
         }
 
-        public Task Timeout(ProcessPaymentTimeout state, IMessageHandlerContext context)
+        public async Task Timeout(ProcessPaymentTimeout state, IMessageHandlerContext context)
         {
-            log.Info("Handle Timeout for " + Data.ReferenceId);
 
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(Data.Status))
+            {
+                log.Info("Handle Timeout for " + Data.ReferenceId);
+
+                var reply = Mapper.Map<ProcessPaymentReply>(Data);
+                reply.Status = "Pending";
+                reply.StatusDate = DateTime.UtcNow;
+
+                await ReplyToOriginator(context, reply);
+            }
+
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ProcessPaymentData> mapper)

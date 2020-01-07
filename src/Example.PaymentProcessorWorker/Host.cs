@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Autofac;
+using AutoMapper.Contrib.Autofac.DependencyInjection;
 using Example.NSBConfiguration;
 using NServiceBus;
 using NServiceBus.Logging;
@@ -26,6 +27,8 @@ namespace Example.PaymentProcessorWorker
             {
 
                 var builder = new ContainerBuilder();
+
+                builder.AddAutoMapper(typeof(Program).Assembly);
 
                 var endpointConfiguration = NSBEndpointConfiguration.ConfigureEndpoint(builder, EndpointName);
 

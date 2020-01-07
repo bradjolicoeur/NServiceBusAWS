@@ -2,6 +2,7 @@
 using Example.PaymentProcessor.Contracts.Events;
 using NServiceBus;
 using NServiceBus.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace Example.PaymentProcessorWorker.Handlers
@@ -17,9 +18,12 @@ namespace Example.PaymentProcessorWorker.Handlers
 
             await context.Publish<ICompletedMakePayment>(messageConstructor:
                 m =>
-             {
-                 m.ReferenceId = message.ReferenceId;
-             });
+                 {
+                     m.ReferenceId = message.ReferenceId;
+                     m.ConfirmationId = Guid.NewGuid().ToString();
+                     m.Status = "Approved";
+                     m.StatusDate = DateTime.UtcNow;
+                 });
         }
     }
 }
