@@ -38,7 +38,7 @@ namespace Example.PaymentSaga.Sagas
             await context.Send(Mapper.Map<MakePayment>(Data));
 
             //Set timeout
-            await RequestTimeout<ProcessPaymentTimeout>(context, TimeSpan.FromSeconds(45));
+            await RequestTimeout<ProcessPaymentTimeout>(context, TimeSpan.FromSeconds(25));
         }
 
         public async Task Handle(ICompletedMakePayment message, IMessageHandlerContext context)

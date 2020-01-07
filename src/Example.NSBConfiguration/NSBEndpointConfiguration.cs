@@ -46,7 +46,7 @@ namespace Example.NSBConfiguration
             var persistence = endpointConfiguration.UsePersistence<MongoPersistence>();
             persistence.MongoClient(new MongoDB.Driver.MongoClient("mongodb://root:example@localhost:27017/")); //TODO:This should be in environment variable
             persistence.UseTransactions(false); //for standalone mongodb...not ideal
-            persistence.DatabaseName("nsbpersistencex");
+            persistence.DatabaseName("nsbpersistence");
 
             return persistence;
         }
