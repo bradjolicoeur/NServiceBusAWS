@@ -1,9 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Logging;
 using Autofac;
+using Example.NSBConfiguration;
 
 namespace Example.ConsumerWorker
 {
@@ -14,6 +14,8 @@ namespace Example.ConsumerWorker
         // LogManager.Use<TheLoggingFactory>();
         static readonly ILog log = LogManager.GetLogger<Host>();
 
+        private static readonly string TransportConfiguration = Environment.GetEnvironmentVariable("TRANSPORT_CONFIGURATION");
+
         IEndpointInstance endpoint = null;
 
         // TODO: give the endpoint an appropriate name
@@ -23,47 +25,23 @@ namespace Example.ConsumerWorker
         {
             try
             {
-                var endpointConfiguration = new EndpointConfiguration(EndpointName);
 
                 var builder = new ContainerBuilder();
 
-                IEndpointInstance endpoint = null;
-                builder.Register(x => endpoint)
-                    .As<IEndpointInstance>()
-                    .SingleInstance();
-
-                var container = builder.Build();
-
-                endpointConfiguration.UseContainer<AutofacBuilder>(
-                    customizations: customizations =>
-                    {
-                        customizations.ExistingLifetimeScope(container);
-                    });
-
-                endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+                var endpointConfiguration = NSBEndpointConfiguration.ConfigureEndpoint(builder, EndpointName);
 
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
 
-                var transportExtensions = endpointConfiguration.UseTransport<LearningTransport>();
-
-                endpointConfiguration.UsePersistence<LearningPersistence>();
-
-                endpointConfiguration.EnableInstallers();
-
-                var conventions = endpointConfiguration.Conventions();
-                conventions.DefiningCommandsAs(
-                    type =>
-                    {
-                        return type.Namespace.EndsWith("Messages.Commands");
-                    });
-
                 endpoint = await Endpoint.Start(endpointConfiguration);
+
             }
             catch (Exception ex)
             {
                 FailFast("Failed to start.", ex);
             }
         }
+
+
 
         public async Task Stop()
         {
