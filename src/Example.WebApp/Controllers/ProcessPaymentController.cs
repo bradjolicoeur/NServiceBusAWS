@@ -24,7 +24,7 @@ namespace Example.WebApp.Controllers
         {
             var message = new ProcessPayment { ReferenceId = Guid.NewGuid().ToString() , AccountNumber = "123456", RoutingNumber = "555555", Amount = 100.45M, RequestDate = DateTime.UtcNow};
             var response = await messageSession.Request<ProcessPaymentReply>(message);
-            return "Completed processing payment: " + JsonConvert.SerializeObject(response);
+            return "Payment Status: " + JsonConvert.SerializeObject(response);
         }
     }
 }
