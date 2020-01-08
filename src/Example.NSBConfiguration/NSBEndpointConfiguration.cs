@@ -6,6 +6,9 @@ using Amazon.S3;
 using Example.PaymentSaga.Contracts.Commands;
 using Example.PaymentProcessor.Contracts.Commands;
 using Example.PaymentProcessor.Contracts.Events;
+using System;
+using NServiceBus.Encryption.MessageProperty;
+using System.Collections.Generic;
 
 namespace Example.NSBConfiguration
 {
@@ -34,11 +37,40 @@ namespace Example.NSBConfiguration
             //Conventions are used to identify messages 
             ConfigureConventions(endpointConfiguration);
 
+            //configure the property level encryption convention
+            //https://docs.particular.net/nservicebus/security/property-encryption
+            ConfigurePropertyEncryption(endpointConfiguration);
+
             //This is the format of the message payload, default is xml, however json is a smaller payload size
             endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             return endpointConfiguration;
 
+        }
+
+        private static void ConfigurePropertyEncryption(EndpointConfiguration endpointConfiguration)
+        {
+
+            var defaultKey = "2015-10";
+
+            //Warning: this is for demonstration purposes, generate your own keys and store them somewhere safe
+            var keys = new Dictionary<string, byte[]>
+            {
+                {"2015-10", Convert.FromBase64String("cxGupxJH5UpEVL6QVgw3x7Eu/i28vj7Kd3DG8GmLxTY=")},
+                {"2015-09", Convert.FromBase64String("fvt7PJQ/aWoVQ18AOBjnO0+8CclPMWxWAPDnz6abgEU=")},
+                {"2015-08", Convert.FromBase64String("IeZQf6mbFJMJXmXo8Tr6zB09Gj9qnzd4mgLWv/kOKMk=")},
+            };
+
+            //Consider using a stronger encryption 
+            var encryptionService = new RijndaelEncryptionService(defaultKey, keys);
+
+            endpointConfiguration.EnableMessagePropertyEncryption(
+                encryptionService: encryptionService,
+                encryptedPropertyConvention: propertyInfo =>
+                {
+                    return propertyInfo.Name.EndsWith("Encrypted")||propertyInfo.Name.EndsWith("AccountNumber");
+                }
+            );
         }
 
         private static PersistenceExtensions ConfigurePersistance(EndpointConfiguration endpointConfiguration)
