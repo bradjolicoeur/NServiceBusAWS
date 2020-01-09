@@ -13,7 +13,7 @@ using Example.PaymentSaga.Messages;
 namespace Example.PaymentSaga.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class SagaTest
     {
         
         [TestInitialize]
