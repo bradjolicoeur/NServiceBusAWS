@@ -9,6 +9,7 @@ using Example.PaymentProcessor.Contracts.Events;
 using System;
 using NServiceBus.Encryption.MessageProperty;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace Example.NSBConfiguration
 {
@@ -63,6 +64,7 @@ namespace Example.NSBConfiguration
 
             //Consider using a stronger encryption 
             var encryptionService = new RijndaelEncryptionService(defaultKey, keys);
+            var kmsEncryptionService = new KMSEncryptionService();
 
             endpointConfiguration.EnableMessagePropertyEncryption(
                 encryptionService: encryptionService,
@@ -75,10 +77,13 @@ namespace Example.NSBConfiguration
 
         private static PersistenceExtensions ConfigurePersistance(EndpointConfiguration endpointConfiguration)
         {
-            var persistence = endpointConfiguration.UsePersistence<MongoPersistence>();
-            persistence.MongoClient(new MongoDB.Driver.MongoClient("mongodb://root:example@localhost:27017/")); //TODO:This should be in environment variable
-            persistence.UseTransactions(false); //for standalone mongodb...not ideal
-            persistence.DatabaseName("nsbpersistence");
+            //todo: put this connection string in an environment variable
+            var connection = "server=localhost;user=devuser;database=testdb;port=3306;password=TestPassword;AllowUserVariables=True;AutoEnlist=false";
+            var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+            var subscriptions = persistence.SubscriptionSettings();
+            subscriptions.CacheFor(TimeSpan.FromMinutes(1));
+            persistence.SqlDialect<SqlDialect.MySql>();
+            persistence.ConnectionBuilder(() => new MySqlConnection(connection));
 
             return persistence;
         }

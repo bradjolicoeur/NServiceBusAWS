@@ -1,6 +1,7 @@
 ﻿using Example.PaymentSaga.Models;
 using System;
 using NServiceBus;
+using mpe = NServiceBus.Encryption.MessageProperty;
 using Example.PaymentSaga.Contracts.Commands;
 using System.Threading.Tasks;
 using Example.PaymentSaga.Messages;
@@ -30,6 +31,8 @@ namespace Example.PaymentSaga.Sagas
         public async Task Handle(ProcessPayment message, IMessageHandlerContext context)
         {
             log.Info("Start Saga for " + Data.ReferenceId);
+
+            log.Info("Account:" + message.AccountNumberEncrypted);
 
             //update saga data
             Mapper.Map(message, Data);
