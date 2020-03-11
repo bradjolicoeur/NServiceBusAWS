@@ -53,7 +53,7 @@ namespace Example.PaymentSaga.Tests
             await saga.Handle(message, context);
 
             //Assert
-            Assert.AreEqual(message.AccountNumberEncrypted, sagaData.AccountNumber);
+            Assert.AreEqual(message.AccountNumberEncrypted, sagaData.AccountNumberEncrypted);
             Assert.AreEqual(message.RoutingNumber, sagaData.RoutingNumber);
             Assert.AreEqual(message.Amount, sagaData.Amount);
             Assert.AreEqual(message.RequestDate, sagaData.RequestDate);
