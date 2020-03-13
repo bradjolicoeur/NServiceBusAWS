@@ -10,6 +10,7 @@ using System;
 using NServiceBus.Encryption.MessageProperty;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using Amazon.KeyManagementService;
 
 namespace Example.NSBConfiguration
 {
@@ -64,7 +65,7 @@ namespace Example.NSBConfiguration
 
             //Consider using a stronger encryption 
             var encryptionService = new RijndaelEncryptionService(defaultKey, keys);
-            var kmsEncryptionService = new KMSEncryptionService();
+            var kmsEncryptionService = new KMSEncryptionService("bc436485-5092-42b8-92a3-0aa8b93536dc", new AmazonKeyManagementServiceConfig { UseHttp = true, ServiceURL = "http://localhost:8081" }); //todo: should not be hard coded
 
             endpointConfiguration.EnableMessagePropertyEncryption(
                 encryptionService: encryptionService,

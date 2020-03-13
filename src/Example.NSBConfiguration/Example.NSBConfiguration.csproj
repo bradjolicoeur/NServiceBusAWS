@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.KeyManagementService" Version="3.3.105.11" />
     <PackageReference Include="NServiceBus" Version="7.2.0" />
     <PackageReference Include="NServiceBus.AmazonSQS" Version="4.4.0" />
     <PackageReference Include="NServiceBus.Autofac" Version="7.0.0" />
