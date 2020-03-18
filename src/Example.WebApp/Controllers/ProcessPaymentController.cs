@@ -22,7 +22,7 @@ namespace Example.WebApp.Controllers
         [HttpGet]
         public async Task<string> Get()
         {
-            var message = new ProcessPayment { ReferenceId = Guid.NewGuid().ToString() , AccountNumber = "123456", RoutingNumber = "555555", Amount = 100.45M, RequestDate = DateTime.UtcNow};
+            var message = new ProcessPayment { ReferenceId = Guid.NewGuid().ToString() , AccountNumberEncrypted = "123456", RoutingNumber = "555555", Amount = 100.45M, RequestDate = DateTime.UtcNow};
             var response = await messageSession.Request<ProcessPaymentReply>(message);
             return "Payment Status: " + JsonConvert.SerializeObject(response);
         }

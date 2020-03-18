@@ -2,13 +2,13 @@ version: '2.1'
 
 services:
   localstack:
-    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_kms}"
     image: localstack/localstack
     ports:
       - "4567-4597:4567-4597"
       - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
     environment:
-      - SERVICES=${SERVICES- }
+      - SERVICES=${SERVICES-s3,sqs }
       - DEBUG=${DEBUG- }
       - DATA_DIR=${DATA_DIR- }
       - PORT_WEB_UI=${PORT_WEB_UI- }
@@ -19,20 +19,22 @@ services:
       - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
 
-  mongo:
-    image: mongo
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: devuser
+      MYSQL_PASSWORD: TestPassword
     ports:
-      - 27017:27017
+      - "3306:3306"
 
-  mongo-express:
-    image: mongo-express
-    restart: always
+  kms:
+    image: nsmithuk/local-kms
+    volumes:
+      - ./init:/init
+      - ./data:/data
     ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      - 8081:8080

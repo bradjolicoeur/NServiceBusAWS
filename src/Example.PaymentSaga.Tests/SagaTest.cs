@@ -44,7 +44,7 @@ namespace Example.PaymentSaga.Tests
 
             var message = new ProcessPayment { 
                 ReferenceId = Guid.NewGuid().ToString()
-                , AccountNumber = "123456"
+                , AccountNumberEncrypted = "123456"
                 , RoutingNumber = "555555"
                 , Amount = 100.45M
                 , RequestDate = DateTime.UtcNow };
@@ -53,14 +53,14 @@ namespace Example.PaymentSaga.Tests
             await saga.Handle(message, context);
 
             //Assert
-            Assert.AreEqual(message.AccountNumber, sagaData.AccountNumber);
+            Assert.AreEqual(message.AccountNumberEncrypted, sagaData.AccountNumberEncrypted);
             Assert.AreEqual(message.RoutingNumber, sagaData.RoutingNumber);
             Assert.AreEqual(message.Amount, sagaData.Amount);
             Assert.AreEqual(message.RequestDate, sagaData.RequestDate);
 
             var makePayment = (MakePayment)context.SentMessages[0].Message;
 
-            Assert.AreEqual(message.AccountNumber, makePayment.AccountNumber);
+            Assert.AreEqual(message.AccountNumberEncrypted, makePayment.AccountNumberEncrypted);
             Assert.AreEqual(message.RoutingNumber, makePayment.RoutingNumber);
             Assert.AreEqual(message.Amount, makePayment.Amount);
             Assert.AreEqual(message.RequestDate, makePayment.RequestDate);

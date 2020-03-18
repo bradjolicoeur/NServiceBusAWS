@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.PaymentProcessor.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.PaymentSaga.Contracts", "Example.PaymentSaga.Contracts\Example.PaymentSaga.Contracts.csproj", "{D3D9BEB1-591F-496D-A7B2-A9843160BB99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.PaymentSaga.Tests", "Example.PaymentSaga.Tests\Example.PaymentSaga.Tests.csproj", "{3EA0241D-4524-49A8-83E2-3C00A151B3E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.PaymentSaga.Tests", "Example.PaymentSaga.Tests\Example.PaymentSaga.Tests.csproj", "{3EA0241D-4524-49A8-83E2-3C00A151B3E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.NSBConfiguration.Test", "Example.NSBConfiguration.Test\Example.NSBConfiguration.Test.csproj", "{21D72726-695F-444D-94CC-20BF33FE3C01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -164,6 +166,24 @@ Global
 		{3EA0241D-4524-49A8-83E2-3C00A151B3E6}.Release|x64.Build.0 = Release|Any CPU
 		{3EA0241D-4524-49A8-83E2-3C00A151B3E6}.Release|x86.ActiveCfg = Release|Any CPU
 		{3EA0241D-4524-49A8-83E2-3C00A151B3E6}.Release|x86.Build.0 = Release|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Debug|x64.Build.0 = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Debug|x86.Build.0 = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.LearningTransport|Any CPU.ActiveCfg = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.LearningTransport|Any CPU.Build.0 = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.LearningTransport|x64.ActiveCfg = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.LearningTransport|x64.Build.0 = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.LearningTransport|x86.ActiveCfg = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.LearningTransport|x86.Build.0 = Debug|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Release|x64.ActiveCfg = Release|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Release|x64.Build.0 = Release|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Release|x86.ActiveCfg = Release|Any CPU
+		{21D72726-695F-444D-94CC-20BF33FE3C01}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +196,7 @@ Global
 		{A32BDF0C-61B8-4600-BB89-A2E097501659} = {C1628DF7-6BC6-4A3F-B1CC-9F462B37A2A1}
 		{D3D9BEB1-591F-496D-A7B2-A9843160BB99} = {7633ABCB-28D8-43A1-8897-0D77FEF853AB}
 		{3EA0241D-4524-49A8-83E2-3C00A151B3E6} = {7633ABCB-28D8-43A1-8897-0D77FEF853AB}
+		{21D72726-695F-444D-94CC-20BF33FE3C01} = {CFDAFF1D-2997-4D2F-A458-20886CBBB2BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A919B40-9611-41D5-870D-2EA68B4AB17C}

@@ -1,6 +1,7 @@
 ﻿using Example.PaymentSaga.Models;
 using System;
 using NServiceBus;
+using mpe = NServiceBus.Encryption.MessageProperty;
 using Example.PaymentSaga.Contracts.Commands;
 using System.Threading.Tasks;
 using Example.PaymentSaga.Messages;
@@ -31,6 +32,8 @@ namespace Example.PaymentSaga.Sagas
         {
             log.Info("Start Saga for " + Data.ReferenceId);
 
+            log.Info("Account:" + message.AccountNumberEncrypted);
+
             //update saga data
             Mapper.Map(message, Data);
 
@@ -38,7 +41,7 @@ namespace Example.PaymentSaga.Sagas
             await context.Send(Mapper.Map<MakePayment>(Data));
 
             //Set timeout
-            await RequestTimeout<ProcessPaymentTimeout>(context, TimeSpan.FromSeconds(25));
+            await RequestTimeout<ProcessPaymentTimeout>(context, TimeSpan.FromSeconds(0.1));
         }
 
         public async Task Handle(ICompletedMakePayment message, IMessageHandlerContext context)
