@@ -53,22 +53,15 @@ namespace Example.NSBConfiguration
         private static void ConfigurePropertyEncryption(EndpointConfiguration endpointConfiguration)
         {
 
-            var defaultKey = "2015-10";
+            var defaultKey = "bc436485-5092-42b8-92a3-0aa8b93536dc"; //Todo: should not be hardcoded
 
-            //Warning: this is for demonstration purposes, generate your own keys and store them somewhere safe
-            var keys = new Dictionary<string, byte[]>
-            {
-                {"2015-10", Convert.FromBase64String("cxGupxJH5UpEVL6QVgw3x7Eu/i28vj7Kd3DG8GmLxTY=")},
-                {"2015-09", Convert.FromBase64String("fvt7PJQ/aWoVQ18AOBjnO0+8CclPMWxWAPDnz6abgEU=")},
-                {"2015-08", Convert.FromBase64String("IeZQf6mbFJMJXmXo8Tr6zB09Gj9qnzd4mgLWv/kOKMk=")},
-            };
-
-            //Consider using a stronger encryption 
-            var encryptionService = new RijndaelEncryptionService(defaultKey, keys);
-            var kmsEncryptionService = new KMSEncryptionService("bc436485-5092-42b8-92a3-0aa8b93536dc", new AmazonKeyManagementServiceConfig { UseHttp = true, ServiceURL = "http://localhost:8081" }); //todo: should not be hard coded
+            var kmsEncryptionService = new KMSEncryptionService(defaultKey, 
+                new AmazonKeyManagementServiceConfig {
+                    //This is for localstack and is not needed if targeting AWS directly
+                    UseHttp = true, ServiceURL = "http://localhost:8081" }); 
 
             endpointConfiguration.EnableMessagePropertyEncryption(
-                encryptionService: encryptionService,
+                encryptionService: kmsEncryptionService,
                 encryptedPropertyConvention: propertyInfo =>
                 {
                     return propertyInfo.Name.EndsWith("Encrypted")||propertyInfo.Name.EndsWith("AccountNumber");

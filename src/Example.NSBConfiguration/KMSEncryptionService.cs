@@ -23,12 +23,26 @@ namespace Example.NSBConfiguration
 
         public string Decrypt(EncryptedValue encryptedValue, IIncomingLogicalMessageContext context)
         {
-            var aliasResponse = _client.ListAliasesAsync(new ListAliasesRequest { Limit = 1000 }).GetAwaiter().GetResult();
+            if (encryptedValue == null || String.IsNullOrEmpty(encryptedValue.EncryptedBase64Value))
+                return null;
 
-            throw new NotImplementedException();
+            if (!context.Headers.ContainsKey(EncryptionHeaders.RijndaelKeyIdentifier))
+                return null;
 
-            //StreamReader reader = new StreamReader(stream);
-            //string text = reader.ReadToEnd();
+            var decryptlabel = context.Headers[EncryptionHeaders.RijndaelKeyIdentifier];
+
+            var decryptRequest = new DecryptRequest { KeyId = decryptlabel };
+            var value = Convert.FromBase64String(encryptedValue.EncryptedBase64Value);
+            decryptRequest.CiphertextBlob = new System.IO.MemoryStream(value);
+
+            var response = _client.DecryptAsync(decryptRequest).GetAwaiter().GetResult();
+
+            if(response != null)
+            {
+                return Encoding.UTF8.GetString(response.Plaintext.ToArray());
+            }
+
+            return null;
         }
 
         public EncryptedValue Encrypt(string value, IOutgoingLogicalMessageContext context)
@@ -39,9 +53,11 @@ namespace Example.NSBConfiguration
                     Plaintext = new System.IO.MemoryStream(Encoding.UTF8.GetBytes(value)) 
                 } ).GetAwaiter().GetResult();
 
+            string base64Value = encrypted != null ? Convert.ToBase64String(encrypted.CiphertextBlob.ToArray())  : null;
+
             return new EncryptedValue
             {
-                EncryptedBase64Value = Convert.ToBase64String(encrypted.CiphertextBlob.ToArray())
+                EncryptedBase64Value = base64Value
             };
         }
 
