@@ -52,13 +52,17 @@ namespace Example.NSBConfiguration
 
         private static void ConfigurePropertyEncryption(EndpointConfiguration endpointConfiguration)
         {
-
+            //this is a key stored in KMS; for reference this same value is in the init\seed.yaml file for kms simulator config
             var defaultKey = "bc436485-5092-42b8-92a3-0aa8b93536dc"; //Todo: should not be hardcoded
 
-            var kmsEncryptionService = new KMSEncryptionService(defaultKey, 
-                new AmazonKeyManagementServiceConfig {
-                    //This is for localstack and is not needed if targeting AWS directly
-                    UseHttp = true, ServiceURL = "http://localhost:8081" }); 
+            var kmsClient = new AmazonKeyManagementServiceClient(new AmazonKeyManagementServiceConfig
+            {
+                //This is for localstack and is not needed if targeting AWS directly
+                UseHttp = true,
+                ServiceURL = "http://localhost:8081"
+            });
+
+            var kmsEncryptionService = new KMSEncryptionService(defaultKey, kmsClient); 
 
             endpointConfiguration.EnableMessagePropertyEncryption(
                 encryptionService: kmsEncryptionService,

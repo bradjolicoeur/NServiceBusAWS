@@ -10,16 +10,14 @@ namespace Example.NSBConfiguration
 {
     public class KMSEncryptionService : IEncryptionService
     {
-        private readonly AmazonKeyManagementServiceClient _client;
+        private readonly IAmazonKeyManagementService _client;
         private string _encryptionKeyIdentifier;
 
-        public KMSEncryptionService(string encryptionKeyIdentifier, AmazonKeyManagementServiceConfig config)
+        public KMSEncryptionService(string encryptionKeyIdentifier, IAmazonKeyManagementService client)
         {
             _encryptionKeyIdentifier = encryptionKeyIdentifier;
-            _client = new AmazonKeyManagementServiceClient(config);
-
+            _client = client;
         }
-
 
         public string Decrypt(EncryptedValue encryptedValue, IIncomingLogicalMessageContext context)
         {
