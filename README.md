@@ -13,6 +13,8 @@ The demo is configured to use localstack and mongodb in docker containers.  Use 
 5. ProcessPaymentSaga consumes ICompletedMakePayment, updates state and sends reply to controller
 6. Controller displays the results to the caller
 
+
+
 If step 4 is delayed, the timeout will triger sending a 'Pending' reply to the controller and the eventual accept message will still get handled in the web api assembly for sending an asyncronous message to the caller.
 
 Note that any keys or passwords included in this repo are provided as examples only.  Make sure you update keys and passwords to appropriate values in your system.
