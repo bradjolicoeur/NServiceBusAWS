@@ -1,6 +1,6 @@
 # NServiceBusAWS
 
-This is an example project that demonstrates using NServiceBus with AWS SQS and MongoDB for persistance.
+This is an example project that demonstrates using NServiceBus with AWS SQS and MySQL for persistance.
 
 The demo is configured to use localstack and mongodb in docker containers.  Use the docker-compose.yml file above to start up the localstack and mongodb containers before running the project.  
 
