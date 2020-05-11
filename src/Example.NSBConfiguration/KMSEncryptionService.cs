@@ -53,15 +53,13 @@ namespace Example.NSBConfiguration
 
             string base64Value = encrypted != null ? Convert.ToBase64String(encrypted.CiphertextBlob.ToArray())  : null;
 
+            context.Headers[EncryptionHeaders.RijndaelKeyIdentifier] = _encryptionKeyIdentifier;
+
             return new EncryptedValue
             {
                 EncryptedBase64Value = base64Value
             };
         }
 
-        protected internal void AddKeyIdentifierHeader(IOutgoingLogicalMessageContext context)
-        {
-            context.Headers[EncryptionHeaders.RijndaelKeyIdentifier] = _encryptionKeyIdentifier;
-        }
     }
 }
