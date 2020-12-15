@@ -152,7 +152,7 @@ namespace Example.NSBConfiguration
                 new EnvironmentVariablesAWSCredentials(),
                 new AmazonSQSConfig //for localstack
                 {
-                    ServiceURL = "http://localhost:4576",
+                    ServiceURL = "http://localhost:4566",
                     UseHttp = true,
                 }));
 
@@ -164,7 +164,7 @@ namespace Example.NSBConfiguration
                 new AmazonS3Client(new EnvironmentVariablesAWSCredentials()
                 , new AmazonS3Config
                 {
-                    ServiceURL = "http://localhost:4572",
+                    ServiceURL = "http://localhost:4566",
                     ForcePathStyle = true,
                     UseHttp = true,
                 }));
