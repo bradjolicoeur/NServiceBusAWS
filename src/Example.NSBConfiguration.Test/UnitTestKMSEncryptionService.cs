@@ -19,7 +19,7 @@ namespace Example.NSBConfiguration.Test
         public void EncryptString()
         {
             const string KEY_ID = "bc436485-5092-42b8-92a3-0aa8b93536dc";
-            var mockContext = new Mock<IIncomingLogicalMessageContext>();
+            var mockContext = new Mock<IOutgoingLogicalMessageContext>();
             var headers = new Dictionary<string, string>
             {
                 { EncryptionHeaders.RijndaelKeyIdentifier, KEY_ID }
@@ -39,7 +39,7 @@ namespace Example.NSBConfiguration.Test
 
             var sut = new KMSEncryptionService(KEY_ID, mockClient.Object);
 
-            var value = sut.Encrypt(ENCRYPT_VALUE, null);
+            var value = sut.Encrypt(ENCRYPT_VALUE, mockContext.Object);
 
             value.Should().NotBeNull();
             value.EncryptedBase64Value.Should().NotBeNullOrEmpty();
